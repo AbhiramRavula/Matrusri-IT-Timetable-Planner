@@ -44,14 +44,14 @@ export const INITIAL_FACULTY = [
 ];
 
 export const INITIAL_ROOMS = [
-  { id: 'r1', name: 'N 305', type: SubjectType.THEORY, capacity: 60 },
-  { id: 'r2', name: 'N 313', type: SubjectType.THEORY, capacity: 60 },
-  { id: 'r3', name: 'N 314', type: SubjectType.THEORY, capacity: 60 },
-  { id: 'r4', name: 'N 304', type: SubjectType.THEORY, capacity: 60 },
+  { id: 'r1', name: 'N 305', type: SubjectType.THEORY, capacity: 70 },
+  { id: 'r2', name: 'N 313', type: SubjectType.THEORY, capacity: 70 },
+  { id: 'r3', name: 'N 314', type: SubjectType.THEORY, capacity: 70 },
+  { id: 'r4', name: 'N 304', type: SubjectType.THEORY, capacity: 70 },
   { id: 'r5', name: 'IT LAB 1', type: SubjectType.LAB, capacity: 35 },
   { id: 'r6', name: 'IT LAB 2', type: SubjectType.LAB, capacity: 35 },
   { id: 'r7', name: 'IT LAB 3', type: SubjectType.LAB, capacity: 35 },
-  { id: 'r8', name: 'LIBRARY', type: SubjectType.THEORY, capacity: 100 },
+  { id: 'r8', name: 'LIBRARY', type: SubjectType.THEORY, capacity: 200 },
   { id: 'r9', name: 'GROUND', type: SubjectType.THEORY, capacity: 200 },
   { id: 'r10', name: 'BE LAB', type: SubjectType.LAB, capacity: 35 },
 ];
@@ -65,11 +65,11 @@ export const INITIAL_SECTIONS = [
 ];
 
 export const INITIAL_STUDENTS: StudentGroup[] = [
-  { id: 'st1', sectionId: 's1', year: 4, semester: 7, strength: 64, rollRange: '2451-21-737-001 to 064' },
-  { id: 'st2', sectionId: 's2', year: 3, semester: 5, strength: 62, rollRange: '2451-22-737-001 to 062' },
-  { id: 'st3', sectionId: 's3', year: 3, semester: 5, strength: 63, rollRange: '2451-22-737-063 to 125' },
-  { id: 'st4', sectionId: 's4', year: 2, semester: 3, strength: 60, rollRange: '2451-23-737-001 to 060' },
-  { id: 'st5', sectionId: 's5', year: 2, semester: 3, strength: 61, rollRange: '2451-23-737-061 to 121' },
+  { id: 'st1', sectionId: 's1', year: 4, semester: 7, strength: 69, rollRange: '1608-22-737-001 to 061 & 1608-22-737-301 to 308' },
+  { id: 'st2', sectionId: 's2', year: 3, semester: 5, strength: 62, rollRange: '1608-21-737-001 to 062' },
+  { id: 'st3', sectionId: 's3', year: 3, semester: 5, strength: 63, rollRange: '1608-21-737-063 to 125' },
+  { id: 'st4', sectionId: 's4', year: 2, semester: 3, strength: 60, rollRange: '1608-20-737-001 to 060' },
+  { id: 'st5', sectionId: 's5', year: 2, semester: 3, strength: 61, rollRange: '1608-20-737-061 to 121' },
 ];
 
 export const INITIAL_SUBJECTS = [
@@ -90,6 +90,14 @@ export const INITIAL_SUBJECTS = [
   { id: 'v5sa_8', code: 'PC557IT', name: 'OS Lab', abbreviation: 'OS LAB', type: SubjectType.LAB, year: 3, semester: 5, section: 'A', periodsPerWeek: 3, assignedFacultyId: 'f11' },
   { id: 'v5sa_9', code: 'PC558IT', name: 'FSD Lab', abbreviation: 'FSD LAB', type: SubjectType.LAB, year: 3, semester: 5, section: 'A', periodsPerWeek: 3, assignedFacultyId: 'f12' },
 
+  // V SEM - SEC B
+  { id: 'v5sb_1', code: 'PC508IT', name: 'Principles of Programming Languages', abbreviation: 'PPL', type: SubjectType.THEORY, year: 3, semester: 5, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f8' },
+  { id: 'v5sb_2', code: 'PC509IT', name: 'Artificial Intelligence', abbreviation: 'AI', type: SubjectType.THEORY, year: 3, semester: 5, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f5' },
+  { id: 'v5sb_3', code: 'PC510IT', name: 'Operating Systems', abbreviation: 'OS', type: SubjectType.THEORY, year: 3, semester: 5, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f7' },
+  { id: 'v5sb_7', code: 'PC556IT', name: 'AI Lab', abbreviation: 'AI LAB', type: SubjectType.LAB, year: 3, semester: 5, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f5' },
+  { id: 'v5sb_8', code: 'PC557IT', name: 'OS Lab', abbreviation: 'OS LAB', type: SubjectType.LAB, year: 3, semester: 5, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f7' },
+  { id: 'v5sb_9', code: 'PC558IT', name: 'FSD Lab', abbreviation: 'FSD LAB', type: SubjectType.LAB, year: 3, semester: 5, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f10' },
+
   // III SEM - SEC A
   { id: 'v3sa_1', code: 'HS301EG', name: 'Effective Technical Communication', abbreviation: 'ETCE', type: SubjectType.THEORY, year: 2, semester: 3, section: 'A', periodsPerWeek: 3, assignedFacultyId: 'f17' },
   { id: 'v3sa_5', code: 'PC302IT', name: 'Database Systems', abbreviation: 'DBS', type: SubjectType.THEORY, year: 2, semester: 3, section: 'A', periodsPerWeek: 3, assignedFacultyId: 'f2' },
@@ -97,6 +105,14 @@ export const INITIAL_SUBJECTS = [
   { id: 'v3sa_9', code: 'PC351IT', name: 'DBS Lab', abbreviation: 'DBS LAB', type: SubjectType.LAB, year: 2, semester: 3, section: 'A', periodsPerWeek: 3, assignedFacultyId: 'f2' },
   { id: 'v3sa_10', code: 'ES351IT', name: 'PP Lab', abbreviation: 'PP LAB', type: SubjectType.LAB, year: 2, semester: 3, section: 'A', periodsPerWeek: 3, assignedFacultyId: 'f12' },
   { id: 'v3sa_11', code: 'ES352EC', name: 'BE Lab', abbreviation: 'BE LAB', type: SubjectType.LAB, year: 2, semester: 3, section: 'A', periodsPerWeek: 3, assignedFacultyId: 'f20' },
+
+  // III SEM - SEC B
+  { id: 'v3sb_1', code: 'HS301EG', name: 'Effective Technical Communication', abbreviation: 'ETCE', type: SubjectType.THEORY, year: 2, semester: 3, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f13' },
+  { id: 'v3sb_5', code: 'PC302IT', name: 'Database Systems', abbreviation: 'DBS', type: SubjectType.THEORY, year: 2, semester: 3, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f6' },
+  { id: 'v3sb_6', code: 'ES301IT', name: 'Python Programming', abbreviation: 'PP', type: SubjectType.THEORY, year: 2, semester: 3, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f10' },
+  { id: 'v3sb_9', code: 'PC351IT', name: 'DBS Lab', abbreviation: 'DBS LAB', type: SubjectType.LAB, year: 2, semester: 3, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f6' },
+  { id: 'v3sb_10', code: 'ES351IT', name: 'PP Lab', abbreviation: 'PP LAB', type: SubjectType.LAB, year: 2, semester: 3, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f10' },
+  { id: 'v3sb_11', code: 'ES352EC', name: 'BE Lab', abbreviation: 'BE LAB', type: SubjectType.LAB, year: 2, semester: 3, section: 'B', periodsPerWeek: 3, assignedFacultyId: 'f21' },
 
   // Common Non-subjects
   { id: 'common_lib', code: 'LIB', name: 'Library', abbreviation: 'LIB', type: SubjectType.THEORY, year: 0, semester: 0, section: '', periodsPerWeek: 0, assignedFacultyId: 'f23' },
