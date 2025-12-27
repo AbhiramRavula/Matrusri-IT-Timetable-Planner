@@ -1,0 +1,7 @@
+{
+  "name": "Matrusri IT Timetable Planner",
+  "description": "An automated, conflict-free timetable generation system for the IT department of Matrusri Engineering College, featuring HoD controls, faculty schedules, and public student views.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
