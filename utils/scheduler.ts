@@ -190,7 +190,7 @@ const addEntry = (
 };
 
 // ============================================================================
-// ADVANCED LAB SCHEDULING (USP ALGORITHM)
+// ADVANCED LAB SCHEDULING (ROTATION PATTERN)
 // ============================================================================
 
 const scheduleLabsForSection = (
@@ -211,84 +211,118 @@ const scheduleLabsForSection = (
 
   const labRooms = rooms.filter(r => r.type === SubjectType.LAB);
   const workingDays = getWorkingDays(section.year);
-  const studentStrength = getStudentStrength(section.id);
-  const numBatches = calculateLabBatches(studentStrength);
 
-  console.log(`\n📚 Lab Scheduling: ${section.name} (Year ${section.year}, ${studentStrength} students)`);
-  console.log(`   Batches: ${numBatches}, Lab Subjects: ${labSubjects.length}, Available Rooms: ${labRooms.length}`);
+  // CRITICAL: Batches based on NUMBER OF LABS, not student strength
+  const numBatches = labSubjects.length;
+  const batchLetters = ['A', 'B', 'C'];
+
+  console.log(`\n📚 Lab Scheduling: ${section.name} (Year ${section.year})`);
+  console.log(`   Lab Subjects: ${labSubjects.length}, Batches: ${numBatches}`);
 
   if (numBatches > labRooms.length) {
-    console.warn(`   ⚠️  Insufficient lab rooms!`);
+    console.warn(`   ⚠️  Insufficient lab rooms for ${numBatches} batches!`);
     return labSubjects.length;
   }
 
-  // STRATEGY: Schedule all labs at SAME time on DIFFERENT days
-  // This ensures students rotate through labs across the week
+  // Calculate how many rotation days needed
+  // If each lab has 3 periods/week and we have 3 labs, each student does 1 period per rotation
+  const periodsPerLab = labSubjects[0]?.periodsPerWeek || 3;
+  const rotationDays = periodsPerLab; // 3 periods = 3 rotation days
+
+  console.log(`   Rotation Days Needed: ${rotationDays}`);
+
+  // Find time slots that work for ALL batches simultaneously
+  const preferredBlocks: number[][] = [[1, 2], [2, 3], [6, 7], [3, 4]];
   
-  const labScheduleDays: string[] = [];
+  let scheduledRotations = 0;
   let unscheduled = 0;
 
-  // Pick optimal lab time slots (prefer early slots)
-  const preferredBlocks = [[1, 2], [2, 3], [6, 7], [3, 4]];
-
-  for (const labSubject of labSubjects) {
+  // Try to schedule all rotation days
+  for (let rotationIndex = 0; rotationIndex < rotationDays; rotationIndex++) {
     let scheduled = false;
 
-    // Find a day that doesn't have a lab yet
+    // Try to find a day for this rotation
     for (const day of shuffle([...workingDays])) {
       if (scheduled) break;
-      
+
+      // Check if this day already has a lab rotation
       const dayKey = `${section.id}-${day}`;
-      const labsOnDay = state.labDayUsage.get(dayKey);
-      if (labsOnDay && labsOnDay.size > 0) continue; // Skip if day has labs
+      if (state.labDayUsage.has(dayKey) && state.labDayUsage.get(dayKey)!.size > 0) {
+        continue; // Skip days that already have labs
+      }
 
       // Try each time block
       for (const [p1, p2] of preferredBlocks) {
         if (scheduled) break;
 
-        // Check if all batches can be accommodated
-        const availableRooms: Room[] = [];
-        
-        for (const room of labRooms) {
-          const r1 = isSlotAvailable(state, faculty, labSubject.assignedFacultyId, room.id, section.id, day, p1);
-          const r2 = isSlotAvailable(state, faculty, labSubject.assignedFacultyId, room.id, section.id, day, p2);
-          if (r1 && r2 && !availableRooms.includes(room)) {
-            availableRooms.push(room);
+        // Check if ALL batches can be scheduled at this time
+        let allBatchesAvailable = true;
+        const roomAssignments: Room[] = [];
+
+        // For each batch, check if we can assign a different lab room
+        for (let batchIdx = 0; batchIdx < numBatches; batchIdx++) {
+          const labIndex = (batchIdx + rotationIndex) % numBatches; // ROTATION LOGIC
+          const lab = labSubjects[labIndex];
+          
+          // Find an available room for this batch
+          let foundRoom = false;
+          for (const room of labRooms) {
+            if (roomAssignments.includes(room)) continue; // Room already taken by another batch
+
+            const r1 = isSlotAvailable(state, faculty, lab.assignedFacultyId, room.id, section.id, day, p1);
+            const r2 = isSlotAvailable(state, faculty, lab.assignedFacultyId, room.id, section.id, day, p2);
+            
+            if (r1 && r2) {
+              roomAssignments.push(room);
+              foundRoom = true;
+              break;
+            }
+          }
+
+          if (!foundRoom) {
+            allBatchesAvailable = false;
+            break;
           }
         }
 
-        if (availableRooms.length >= numBatches) {
-          // Schedule this lab across multiple rooms (batches)
-          const batchLetters = ['A', 'B', 'C'];
-          
-          for (let b = 0; b < numBatches; b++) {
-            const batchName = `BATCH ${batchLetters[b]}`;
-            const room = availableRooms[b];
+        if (allBatchesAvailable && roomAssignments.length === numBatches) {
+          // Schedule the rotation!
+          console.log(`   ✓ Rotation ${rotationIndex + 1}/${rotationDays} on ${day} P${p1}-${p2}`);
 
-            addEntry(state, day, p1, labSubject.id, labSubject.assignedFacultyId, room.id, section.id, batchName);
-            addEntry(state, day, p2, labSubject.id, labSubject.assignedFacultyId, room.id, section.id, batchName);
+          for (let batchIdx = 0; batchIdx < numBatches; batchIdx++) {
+            const labIndex = (batchIdx + rotationIndex) % numBatches; // ROTATION
+            const lab = labSubjects[labIndex];
+            const batchName = `BATCH ${batchLetters[batchIdx]}`;
+            const room = roomAssignments[batchIdx];
+
+            console.log(`      - ${batchName}: ${lab.abbreviation} in ${room.name}`);
+
+            // Add TWO periods for this batch-lab combination
+            addEntry(state, day, p1, lab.id, lab.assignedFacultyId, room.id, section.id, batchName);
+            addEntry(state, day, p2, lab.id, lab.assignedFacultyId, room.id, section.id, batchName);
           }
 
-          // Mark day as having this lab
+          // Mark this day as having labs
           if (!state.labDayUsage.has(dayKey)) {
             state.labDayUsage.set(dayKey, new Set());
           }
-          state.labDayUsage.get(dayKey)!.add(labSubject.id);
-          
-          console.log(`   ✓ ${labSubject.name}: ${day} P${p1}-${p2}, ${numBatches} batches`);
+          labSubjects.forEach(lab => state.labDayUsage.get(dayKey)!.add(lab.id));
+
           scheduled = true;
-          labScheduleDays.push(day);
+          scheduledRotations++;
         }
       }
     }
 
     if (!scheduled) {
-      console.warn(`   ✗ Could not schedule: ${labSubject.name}`);
+      console.warn(`   ✗ Failed to schedule rotation ${rotationIndex + 1}`);
       unscheduled++;
     }
   }
 
-  return unscheduled;
+  // Calculate total unscheduled periods
+  const missedRotations = rotationDays - scheduledRotations;
+  return missedRotations > 0 ? labSubjects.length * missedRotations : 0;
 };
 
 // ============================================================================
@@ -361,7 +395,7 @@ const scheduleTheoryForSection = (
 };
 
 // ============================================================================
-// STRATEGIC GAP FILLING
+// STRATEGIC GAP FILLING (CRITICAL: NO GAPS IN FIRST 4 PERIODS)
 // ============================================================================
 
 const fillGaps = (
@@ -377,44 +411,42 @@ const fillGaps = (
 
   if (!libSubject || !sportsSubject || !libRoom || !groundRoom) return;
 
-  console.log('\n🎯 Gap Filling...');
+  console.log('\n🎯 Mandatory Gap Filling (First 4 Periods)...');
 
   for (const section of sections) {
     const workingDays = getWorkingDays(section.year);
 
     for (const day of workingDays) {
-      // Check if day has academic classes
+      // Check if day has ANY academic classes
       const hasAcademic = state.timetable.some(t => 
         t.sectionId === section.id && t.day === day &&
         PRE_LUNCH_PERIODS.includes(t.period)
       );
 
-      if (!hasAcademic) continue;
+      if (!hasAcademic) continue; // Skip holidays
 
-      // Fill ONE library period (prefer pre-lunch gap)
-      let libAdded = false;
+      // CRITICAL: Fill ALL gaps in first 4 periods (PRE_LUNCH_PERIODS)
       for (const period of PRE_LUNCH_PERIODS) {
-        if (libAdded) break;
-        if (state.sectionBusy.has(`${section.id}-${day}-${period}`)) continue;
+        if (state.sectionBusy.has(`${section.id}-${day}-${period}`)) {
+          continue; // Already has a class
+        }
 
+        // Gap found! Fill it with library (prefer library for academic feel)
+        console.log(`   Filling gap: ${section.name} ${day} P${period} with LIBRARY`);
         addEntry(state, day, period, libSubject.id, libSubject.assignedFacultyId, libRoom.id, section.id);
-        libAdded = true;
       }
 
-      // Add minimal sports (1-2 periods post-lunch)
-      let sportsAdded = 0;
-      for (const period of POST_LUNCH_PERIODS) {
-        if (sportsAdded >= 2) break;
-        if (state.sectionBusy.has(`${section.id}-${day}-${period}`)) continue;
+      // Post-lunch: Add minimal sports (only if less than half-filled)
+      const postOccupied = POST_LUNCH_PERIODS.filter(p => 
+        state.sectionBusy.has(`${section.id}-${day}-${p}`)
+      ).length;
 
-        // Only add if most post-lunch slots are empty
-        const postOccupied = POST_LUNCH_PERIODS.filter(p => 
-          state.sectionBusy.has(`${section.id}-${day}-${p}`)
-        ).length;
+      if (postOccupied < 1) { // If both post-lunch slots are empty
+        for (const period of POST_LUNCH_PERIODS) {
+          if (state.sectionBusy.has(`${section.id}-${day}-${period}`)) continue;
 
-        if (postOccupied < 1) {
           addEntry(state, day, period, sportsSubject.id, sportsSubject.assignedFacultyId, groundRoom.id, section.id);
-          sportsAdded++;
+          break; // Add only one sports period
         }
       }
     }
