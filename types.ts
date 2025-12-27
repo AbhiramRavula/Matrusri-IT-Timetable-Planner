@@ -57,6 +57,15 @@ export interface Section {
   wefDate?: string;
 }
 
+export interface StudentGroup {
+  id: string;
+  sectionId: string;
+  year: number;
+  semester: number;
+  strength: number;
+  rollRange: string; // e.g., "2451-23-737-001 to 060"
+}
+
 export interface TimetableEntry {
   id: string;
   day: string;
@@ -65,6 +74,7 @@ export interface TimetableEntry {
   facultyId: string;
   roomId: string;
   sectionId: string;
+  batch?: string; // New field for lab batching: 'B1', 'B2', 'B3' or undefined for whole class
 }
 
 export interface ChangeLog {
@@ -81,6 +91,7 @@ export interface AppState {
   subjects: Subject[];
   rooms: Room[];
   sections: Section[];
+  students: StudentGroup[];
   timetable: TimetableEntry[];
   logs: ChangeLog[];
   isPublished: boolean;
